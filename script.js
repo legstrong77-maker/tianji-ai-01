@@ -246,59 +246,63 @@ function processRealLandmarks(landmarks) {
 
     // --- Deterministic Algorithmic Translation to Bazi & Scores ---
     
-    // Base Score: Start at 80, alter based on symmetry and classical ideal proportions
-    let score = 80;
-    
-    // "Golden Ratio" logic for face height vs width (ideal approx 1.6)
+    // Instead of fixed base score and binary thresholds, calculate deviations 
+    // from statistical normal ratios to ensure every face has a customized score.
+    const idealRatio = 1.45;
+    const idealJaw = 0.75;
+    const idealNose = 0.22;
+    const idealEye = 0.24;
+
     let ratio = faceHeight / faceWidth;
-    if (ratio > 1.5 && ratio < 1.7) score += 5;
-    else if (ratio <= 1.5) score += 2; // wider faces
+    const ratioDiff = Math.abs(ratio - idealRatio);
+    const jawDiff = jawRatio - idealJaw;     // positive = wider jaw
+    const noseDiff = noseRatio - idealNose;   // positive = wider nose
+    const eyeDiff = eyeRatio - idealEye;      // positive = wider eyes
 
-    // Wide jawline (Earth/Metal element, sturdy)
-    if (jawRatio > 0.8) score += 4;
-    
-    // Nose width (Wealth Palace in physiognomy - wider fleshy noses better)
-    if (noseRatio > 0.22) score += 4;
-    else score -= 2;
+    // Calculate dynamic base score starting from mid 70s up to 90s+
+    let score = 80;
+    score -= (ratioDiff * 30); // closer to ideal proportion is better
+    score += (jawDiff * 15);   // sturdy jaw adds points
+    score += (noseDiff * 40);  // prominent/fleshy nose adds points
+    score -= Math.abs(eyeDiff * 20); // eyes should be near ideal width
 
-    score = Math.floor(Math.min(max=99, Math.max(min=65, score)));
+    // Add deterministic variance tied predictably to exact coordinate sums 
+    // so even very similar photos might have 1-2 points variance
+    const uniqueFactor = (Math.round(pts[1].x + pts[15].y + pts[27].x)) % 9;
+    score += uniqueFactor - 4; // variance of -4 to +4
+
+    score = Math.floor(Math.min(99, Math.max(65, score)));
     document.getElementById('total-score').innerText = score;
 
-    // Element Assignment (Five Elements Strategy based on geometry)
+    // Element Assignment (Find the most prominent deviating geometric trait)
     const elements = document.querySelectorAll('.element-tag');
     elements.forEach(e => e.classList.remove('active'));
 
-    let traits = [];
-    if (jawRatio > 0.85) { 
-        traits.push("土"); // Earth: Square jaw
-        document.querySelector('.element-tag.earth').classList.add('active');
-    }
-    if (ratio > 1.65) {
-        traits.push("木"); // Wood: Long face
-        document.querySelector('.element-tag.wood').classList.add('active');
-    }
-    if (noseRatio > 0.23) {
-        traits.push("金"); // Metal: Prominent nose
-        document.querySelector('.element-tag.metal').classList.add('active');
-    }
-    if (eyeRatio > 0.25) {
-        traits.push("水"); // Water: Wide eyes, intuition
-        document.querySelector('.element-tag.water').classList.add('active');
-    }
-    if (traits.length === 0) {
-        traits.push("火"); // Default to Fire if sharp features aren't strongly met
-        document.querySelector('.element-tag.fire').classList.add('active');
-    }
+    const deviations = [
+        { name: "木", val: (ratio - idealRatio) * 1.5 }, // favoring longer face
+        { name: "土", val: jawDiff * 2.0 },              // favoring wider, square jaw
+        { name: "金", val: noseDiff * 3.0 },             // favoring wider nose (wealth palace)
+        { name: "水", val: eyeDiff * 2.5 },              // favoring wider set eyes
+        { name: "火", val: (0.1 - ratioDiff) * 3.0 }     // favoring sharp, highly balanced features
+    ];
+    
+    // Sort by largest value to determine the single dominant element
+    deviations.sort((a, b) => b.val - a.val);
+    const dominantElement = deviations[0].name;
+
+    // Apply active class based on dominant element mapping
+    const elMap = {"木": "wood", "土": "earth", "金": "metal", "水": "water", "火": "fire"};
+    document.querySelector('.element-tag.' + elMap[dominantElement]).classList.add('active');
 
     // Set Bazi Summary deterministically based on Elements
     const summaries = {
         "土": "面龐方正，土星當局。為人踏實穩健，具備強大包容力與信用品格。晚運極佳。",
         "木": "面形瘦長，木氣逢生。具有極高學習力與仁慈心計，適合從事企劃與教職。",
-        "金": "鼻樑高挺，金水相生。性格剛毅果決，財帛宮明亮，投資理財有獨到眼光。",
+        "金": "鼻翼豐隆，金水相生。性格剛毅果決，財帛宮明亮，投資理財有獨到眼光。",
         "水": "眼界開闊，水秀清明。靈動力強，適應環境能力極佳，容易得異性貴人相助。",
         "火": "五官立體，火明炎上。企圖心旺盛，充滿熱情與領導力，早年即現成名之相。"
     };
-    const finalSummary = summaries[traits[0]] || summaries["金"];
+    const finalSummary = summaries[dominantElement];
     document.querySelector('.bazi-summary').innerText = finalSummary;
 
     // Update Bar charts deterministically
