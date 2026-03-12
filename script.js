@@ -244,16 +244,38 @@ function processRealLandmarks(landmarks) {
     const mouthWidth = getDist(pts[48], pts[54]);
     const mouthRatio = mouthWidth / faceWidth;
 
-    // --- Deterministic Algorithmic Translation to Bazi & Scores ---
-    
-    // Instead of fixed base score and binary thresholds, calculate deviations 
-    // from statistical normal ratios to ensure every face has a customized score.
+    // --- Inject Geometry Evidence Report ---
+    const geoList = document.getElementById('geometry-report-list');
     const idealRatio = 1.45;
     const idealJaw = 0.75;
     const idealNose = 0.22;
     const idealEye = 0.24;
 
     let ratio = faceHeight / faceWidth;
+    
+    geoList.innerHTML = `
+        <div class="geo-item">
+            <span class="geo-label">面部長寬比 (Face Ratio)</span>
+            <div><span class="geo-value">${ratio.toFixed(3)}</span> <span class="geo-desc">(木氣指標，常人數值~${idealRatio})</span></div>
+        </div>
+        <div class="geo-item">
+            <span class="geo-label">下頷廓寬比 (Jaw Ratio)</span>
+            <div><span class="geo-value">${jawRatio.toFixed(3)}</span> <span class="geo-desc">(土氣指標，常人數值~${idealJaw})</span></div>
+        </div>
+        <div class="geo-item">
+            <span class="geo-label">鼻面寬度比 (Nose Ratio)</span>
+            <div><span class="geo-value">${noseRatio.toFixed(3)}</span> <span class="geo-desc">(金氣指標，常人數值~${idealNose})</span></div>
+        </div>
+        <div class="geo-item">
+            <span class="geo-label">雙眼間距比 (Eye Spacing)</span>
+            <div><span class="geo-value">${eyeRatio.toFixed(3)}</span> <span class="geo-desc">(水氣指標，常人數值~${idealEye})</span></div>
+        </div>
+    `;
+
+    // --- Deterministic Algorithmic Translation to Bazi & Scores ---
+    
+    // Instead of fixed base score and binary thresholds, calculate deviations 
+    // from statistical normal ratios to ensure every face has a customized score.
     const ratioDiff = Math.abs(ratio - idealRatio);
     const jawDiff = jawRatio - idealJaw;     // positive = wider jaw
     const noseDiff = noseRatio - idealNose;   // positive = wider nose
