@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天機 AI - 智能面相與命理分析</title>
+    <!-- Google Fonts: Noto Serif TC (Traditional) & Inter (Modern) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Noto+Serif+TC:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="stars-bg"></div>
+    <div class="mist-overlay"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1 class="logo-text">天機 <span class="accent-gold">AI</span></h1>
+            <p class="subtitle">洞察天機 · 預見未來</p>
+        </header>
+
+        <!-- View 1: Upload Area -->
+        <main id="upload-view" class="view section-active">
+            <div class="upload-card glass-panel">
+                <div class="upload-icon-wrapper">
+                    <div class="glow-ring"></div>
+                    <i class="fa-solid fa-face-viewfinder upload-icon"></i>
+                </div>
+                <h2>開啟您的命理之門</h2>
+                <p>上傳正臉清晰照片，讓 AI 結合傳統相學為您解碼命盤。</p>
+                
+                <div class="drop-zone" id="drop-zone">
+                    <input type="file" id="file-input" accept="image/jpeg, image/png, image/webp" hidden>
+                    <div class="drop-content">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span class="drop-text">點擊或拖曳照片至此處</span>
+                        <span class="drop-hint">支援 JPG, PNG, WEBP (最大 5MB)</span>
+                    </div>
+                </div>
+                
+                <div class="privacy-note">
+                    <i class="fa-solid fa-shield-halved"></i> 您的照片僅用於本地分析，我們不儲存任何隱私資料。
+                </div>
+            </div>
+        </main>
+
+        <!-- View 2: Scanning State -->
+        <main id="scan-view" class="view section-hidden">
+            <div class="scanning-container">
+                <div class="scan-frame">
+                    <img id="scanned-image" src="" alt="Scanning Target">
+                    <div class="scan-laser"></div>
+                    <div class="scan-overlay-grid"></div>
+                    <!-- Tracking Dots -->
+                    <div class="track-dot" style="top:30%; left:35%;"></div>
+                    <div class="track-dot" style="top:30%; left:65%;"></div>
+                    <div class="track-dot" style="top:45%; left:50%;"></div>
+                    <div class="track-dot" style="top:60%; left:50%;"></div>
+                </div>
+                <div class="scan-status glass-panel">
+                    <h3 class="status-text">正在連結易理運算核心...</h3>
+                    <div class="progress-bar-bg">
+                        <div class="progress-fill" id="scan-progress"></div>
+                    </div>
+                    <div class="terminal-logs" id="terminal-logs">
+                        <p>> 載入五官特徵模型...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- View 3: Results Dashboard -->
+        <main id="result-view" class="view section-hidden">
+            <div class="dashboard-header">
+                <h2>天機命理解析報告</h2>
+                <button id="reset-btn" class="glass-btn"><i class="fa-solid fa-rotate-right"></i> 重新測算</button>
+            </div>
+            
+            <div class="dashboard-grid">
+                <!-- Left Column: Face Analysis -->
+                <div class="dash-column left-col">
+                    <div class="glass-panel result-card face-visual">
+                        <div class="analyzed-frame" id="analyzed-frame">
+                            <img id="result-image" src="" alt="Analyzed Face">
+                            <canvas id="face-canvas" class="face-canvas"></canvas>
+                            <div class="aura-glow"></div>
+                        </div>
+                        <div class="face-score-box">
+                            <span class="score-label">面相總評分</span>
+                            <span class="score-value accent-gold" id="total-score">92</span>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-panel result-card">
+                        <h3><i class="fa-solid fa-masks-theater text-gold"></i> 五官運勢圖</h3>
+                        <div class="radar-chart-placeholder">
+                            <!-- Custom CSS visualization for "radar" chart using flex bars to avoid heavy libs -->
+                            <div class="stat-row"><span class="stat-name">三庭</span><div class="stat-bar"><div class="stat-fill" style="width: 85%;"></div></div><span class="stat-val">大吉</span></div>
+                            <div class="stat-row"><span class="stat-name">五嶽</span><div class="stat-bar"><div class="stat-fill" style="width: 78%;"></div></div><span class="stat-val">吉</span></div>
+                            <div class="stat-row"><span class="stat-name">雙目</span><div class="stat-bar"><div class="stat-fill" style="width: 95%;"></div></div><span class="stat-val">上吉</span></div>
+                            <div class="stat-row"><span class="stat-name">財帛</span><div class="stat-bar"><div class="stat-fill" style="width: 88%;"></div></div><span class="stat-val">大吉</span></div>
+                            <div class="stat-row"><span class="stat-name">印堂</span><div class="stat-bar"><div class="stat-fill" style="width: 70%;"></div></div><span class="stat-val">平</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Destiny & Advice -->
+                <div class="dash-column right-col">
+                    <!-- Bazi Summary -->
+                    <div class="glass-panel result-card bazi-card">
+                        <h3><i class="fa-solid fa-compass text-gold"></i> 命理格局</h3>
+                        <p class="bazi-summary">貴氣逢生，水木相生之局。面相顯示您具備強烈的直覺與創造力，近期將有貴人相助。</p>
+                        <div class="five-elements">
+                            <div class="element-tag metal">金</div>
+                            <div class="element-tag wood active">木</div>
+                            <div class="element-tag water active">水</div>
+                            <div class="element-tag fire">火</div>
+                            <div class="element-tag earth">土</div>
+                        </div>
+                    </div>
+
+                    <!-- Professional Advice Cards -->
+                    <div class="advice-grid">
+                        <div class="glass-panel advice-item">
+                            <div class="advice-icon wealth"><i class="fa-solid fa-coins"></i></div>
+                            <h4>財運解析</h4>
+                            <p>鼻樑挺直，鼻翼豐滿。正財穩定，偏財亦有小斬獲。建議在農曆下半年留意投資機會，避免高風險博弈。</p>
+                        </div>
+                        <div class="glass-panel advice-item">
+                            <div class="advice-icon career"><i class="fa-solid fa-briefcase"></i></div>
+                            <h4>事業發展</h4>
+                            <p>天庭飽滿，事業宮明亮。適合從事需創新與領導力的工作。本季易得主管賞識，宜展現企圖心。</p>
+                        </div>
+                        <div class="glass-panel advice-item">
+                            <div class="advice-icon love"><i class="fa-solid fa-heart"></i></div>
+                            <h4>感情姻緣</h4>
+                            <p>桃花眼顯，人緣極佳。單身者有望在近期結識志同道合的伴侶；有伴侶者需注意溝通，避免過度自我。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer Info -->
+        <footer class="app-footer">
+            <p><a href="#" id="open-references" class="reference-link"><i class="fa-solid fa-book-open"></i> 參考文獻與相學典籍</a></p>
+        </footer>
+    </div>
+
+    <!-- References Modal -->
+    <div id="reference-modal" class="modal-overlay hidden">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h2>相學參考典籍與數據來源</h2>
+                <button id="close-modal" class="glass-btn icon-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <p>本系統之面相特徵提取與命理推算，旨在結合現代電腦視覺技術與傳統相學理論。系統核心理論與特徵資料庫的建構，參考了以下經典命理與相學著作：</p>
+                <ul>
+                    <li><strong>《神相全編》：</strong>相傳為陳摶（希夷）祖師所著，為中國相學的集大成之作，探討面部十二宮位與流年吉凶的對應關係。</li>
+                    <li><strong>《冰鑑》：</strong>曾國藩所著之識人專著，側重於「神、骨、剛、柔、氣、色」，是本系統身相、骨相與氣色評估的重要參數來源。</li>
+                    <li><strong>《麻衣神相》：</strong>經典圖解相學著作，用於定義五官（眉、眼、耳、鼻、口）的幾何形狀吉凶與性格特質的映射。</li>
+                    <li><strong>三命通會與子平八字：</strong>用於命理演算模組，將面相特徵與五行生剋、流年運勢進行交叉比對。</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Face API (Loaded from CDN for Edge AI processing) -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.min.js"></script>
+    <script defer src="script.js"></script>
+</body>
+</html>
