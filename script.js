@@ -335,7 +335,7 @@ function processRealLandmarks(landmarks) {
     updateBarChart('印堂', Math.min(100, 70 + (eyeRatio * 80)));
     
     // Send Data to Google Backend API
-    postToGoogleBackend(score, traits[0] || "金", finalSummary);
+    postToGoogleBackend(score, dominantElement || "金", finalSummary);
 }
 
 function postToGoogleBackend(score, element, baziSummary) {
